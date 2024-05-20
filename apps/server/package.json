@@ -1,0 +1,14 @@
+{
+    "name": "server",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+        "start": "node dist/index.js",
+        "build": "tsc -p ."
+    },
+    "devDependencies": {
+        "tsc-watch": "^6.2.0",
+        "typescript": "^5.4.5"
+    }
+}
