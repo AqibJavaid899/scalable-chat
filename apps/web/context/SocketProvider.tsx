@@ -9,35 +9,46 @@ interface SocketProviderProps {
 
 interface ISocketContext {
   sendMessage: (message: string) => any;
+  messages: string[];
 }
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = React.useState<Socket>();
+  const [messages, setMessages] = React.useState<string[]>([]);
+
+  const messageRecieved = React.useCallback((msg: string) => {
+    console.log("\nMsg from Server to Client is : ", msg);
+    const { message } = JSON.parse(msg) as { message: string };
+    setMessages((prevState) => [...prevState, message]);
+  }, []);
 
   React.useEffect(() => {
     const _socket = io("http://localhost:8000");
     setSocket(_socket);
 
+    _socket.on("srv:message", messageRecieved);
+
     return () => {
       _socket.disconnect();
+      _socket.off("srv:message", messageRecieved);
       setSocket(undefined);
     };
   }, []);
 
   const sendMessage: ISocketContext["sendMessage"] = React.useCallback(
     (message: string) => {
-      console.log("\nMsg that is about to be send is : ", message);
+      console.log("\nMsg from Client to Server is : ", message);
       if (socket) {
-        socket.emit("event:message", { message });
+        socket.emit("client:message", { message });
       }
     },
     [socket]
   );
 
   return (
-    <SocketContext.Provider value={{ sendMessage }}>
+    <SocketContext.Provider value={{ sendMessage, messages }}>
       {children}
     </SocketContext.Provider>
   );

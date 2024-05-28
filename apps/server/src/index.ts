@@ -7,7 +7,6 @@ async function init() {
     const PORT = process.env.PORT || 8000;
 
     const socketService = new SocketService();
-
     socketService.io.attach(httpServer);
 
     httpServer.listen(PORT, () => console.log(`Server is running at PORT:${PORT}`))

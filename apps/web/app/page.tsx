@@ -8,7 +8,7 @@ import styles from "./page.module.css";
 export default function Page(): JSX.Element {
   const [message, setMessage] = React.useState<string>("");
 
-  const { sendMessage } = useSocket();
+  const { sendMessage, messages } = useSocket();
 
   return (
     <div className={styles["container"]}>
@@ -30,6 +30,13 @@ export default function Page(): JSX.Element {
         >
           Send
         </button>
+      </div>
+
+      {/* messages */}
+      <div className={styles["msg-container"]}>
+        {messages.map((msg: string) => (
+          <li>{msg}</li>
+        ))}
       </div>
     </div>
   );
