@@ -1,9 +1,21 @@
 import { Server } from "socket.io";
 import { Redis } from "ioredis";
 
-const pub = new Redis()
+import prismaClient from './prisma'
 
-const sub = new Redis();
+const pub = new Redis({
+  port: 28859,
+  host: "redis-3aea9993-aqibjaved0910-d965.h.aivencloud.com",
+  username: "default",
+  password: "AVNS_N_NimgNCKlMlmto7Pi5",
+})
+
+const sub = new Redis({
+  port: 28859,
+  host: "redis-3aea9993-aqibjaved0910-d965.h.aivencloud.com",
+  username: "default",
+  password: "AVNS_N_NimgNCKlMlmto7Pi5",
+});
 
 class SocketService {
   private _io: Server;
@@ -36,10 +48,16 @@ class SocketService {
       });
     });
 
-    sub.on("message", (channel, message) => {
+    sub.on("message", async (channel, message) => {
       if (channel === "MESSAGES") {
-        console.log("\nMsg from MESSAGES Channel is : ", message)
+        let payload = JSON.parse(message);
+        console.log("\nMsg from MESSAGES Channel is : ", payload.message)
         io.emit("srv:message", message);
+        await prismaClient.message.create({
+          data: {
+            text: payload.message
+          }
+        })
       }
     })
   }
