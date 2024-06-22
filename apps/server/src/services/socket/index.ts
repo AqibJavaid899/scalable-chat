@@ -1,14 +1,14 @@
 import { Server } from "socket.io";
 import { Redis } from "ioredis";
 
-import prismaClient from './prisma'
+import { produceMessage } from "../kafka/index";
 
 const pub = new Redis({
   port: 28859,
   host: "redis-3aea9993-aqibjaved0910-d965.h.aivencloud.com",
   username: "default",
   password: "AVNS_N_NimgNCKlMlmto7Pi5",
-})
+});
 
 const sub = new Redis({
   port: 28859,
@@ -25,12 +25,12 @@ class SocketService {
       cors: {
         allowedHeaders: ["*"],
         origin: "*",
-        methods: ["*"]
-      }
+        methods: ["*"],
+      },
     });
 
     // subscribing to the redis for channel "MESSAGES"
-    sub.subscribe("MESSAGES")
+    sub.subscribe("MESSAGES");
   }
 
   initListeners() {
@@ -44,22 +44,21 @@ class SocketService {
         console.log("On Client:Message, Rec Payload is : ", message);
 
         // pushing the recieved message to redis cloud
-        await pub.publish("MESSAGES", JSON.stringify({message}));
+        await pub.publish("MESSAGES", JSON.stringify({ message }));
       });
     });
 
     sub.on("message", async (channel, message) => {
       if (channel === "MESSAGES") {
         let payload = JSON.parse(message);
-        console.log("\nMsg from MESSAGES Channel is : ", payload.message)
+
+        console.log("\nMsg from MESSAGES Channel is : ", payload.message);
         io.emit("srv:message", message);
-        await prismaClient.message.create({
-          data: {
-            text: payload.message
-          }
-        })
+
+        // publishing the message to kafka broker
+        await produceMessage(message);
       }
-    })
+    });
   }
 
   get io() {

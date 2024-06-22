@@ -8,7 +8,10 @@ interface SocketProviderProps {
 }
 
 interface ISocketContext {
-  sendMessage: (message: string) => any;
+  sendMessage: (
+    message: string,
+    setMessage: React.Dispatch<React.SetStateAction<string>>
+  ) => any;
   messages: string[];
 }
 
@@ -38,10 +41,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   }, []);
 
   const sendMessage: ISocketContext["sendMessage"] = React.useCallback(
-    (message: string) => {
+    (
+      message: string,
+      setMessage: React.Dispatch<React.SetStateAction<string>>
+    ) => {
       console.log("\nMsg from Client to Server is : ", message);
       if (socket) {
         socket.emit("client:message", { message });
+        setMessage("");
       }
     },
     [socket]

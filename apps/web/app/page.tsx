@@ -10,6 +10,10 @@ export default function Page(): JSX.Element {
 
   const { sendMessage, messages } = useSocket();
 
+  const handleMessage = () => {
+    sendMessage(message, setMessage);
+  };
+
   return (
     <div className={styles["container"]}>
       <div>
@@ -26,7 +30,7 @@ export default function Page(): JSX.Element {
       <div>
         <button
           className={styles["chat-sendBtn"]}
-          onClick={() => sendMessage(message)}
+          onClick={() => handleMessage()}
         >
           Send
         </button>

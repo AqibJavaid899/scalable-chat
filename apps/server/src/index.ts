@@ -1,17 +1,21 @@
-import http from 'http'
+import http from "http";
 
-import SocketService from './services/socket';
+import SocketService from "./services/socket/index";
+import { startConsumerSrv } from "./services/kafka/index";
 
 async function init() {
-    const httpServer = http.createServer();
-    const PORT = process.env.PORT || 8000;
+  startConsumerSrv();
 
-    const socketService = new SocketService();
-    socketService.io.attach(httpServer);
+  const httpServer = http.createServer();
+  const PORT = process.env.PORT || 8000;
 
-    httpServer.listen(PORT, () => console.log(`Server is running at PORT:${PORT}`))
+  const socketService = new SocketService();
+  socketService.io.attach(httpServer);
 
-    socketService.initListeners();
+  httpServer.listen(PORT, () =>
+    console.log(`Server is running at PORT:${PORT}`)
+  );
+  socketService.initListeners();
 }
 
 init();
