@@ -5,14 +5,14 @@ import path from "path";
 import prismaClient from "../prisma";
 
 const kafka = new Kafka({
-  brokers: ["kafka-7c28c8f-aqibjaved0910-d965.f.aivencloud.com:28872"],
+  brokers: [""],
   ssl: {
-    ca: [fs.readFileSync(path.resolve("./src/services/kafka/ca.pem"), "utf-8")],
+    ca: [fs.readFileSync(path.resolve("./ca.pem"), "utf-8")],
   },
   sasl: {
-    username: "avnadmin",
-    password: "AVNS_ze3C1wGdls1YE113XPl",
-    mechanism: "plain",
+    username: "",
+    password: "",
+    mechanism: "",
   },
 });
 
@@ -63,7 +63,7 @@ const commitToDatabase = async (
     });
   } catch (error) {
     console.log("Error is : ", error);
-    // pausing the consumer service for 1 min
+    //  pausing the consumer service for 1 min
     pause();
     setInterval(() => {
       consumer.resume([{ topic: "MESSAGES" }]);
@@ -83,7 +83,7 @@ export const startConsumerSrv = async () => {
       const msg = message.value?.toString();
       const payload: { message: string } = JSON.parse(msg);
 
-      //   pushing the message from Kafka into the db
+      //  pushing the message from Kafka into the db
       await commitToDatabase(payload.message, consumer, pause);
     },
   });

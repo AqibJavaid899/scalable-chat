@@ -4,17 +4,17 @@ import { Redis } from "ioredis";
 import { produceMessage } from "../kafka/index";
 
 const pub = new Redis({
-  port: 28859,
-  host: "redis-3aea9993-aqibjaved0910-d965.h.aivencloud.com",
-  username: "default",
-  password: "AVNS_N_NimgNCKlMlmto7Pi5",
+  port: 12345,
+  host: "",
+  username: "",
+  password: "",
 });
 
 const sub = new Redis({
-  port: 28859,
-  host: "redis-3aea9993-aqibjaved0910-d965.h.aivencloud.com",
-  username: "default",
-  password: "AVNS_N_NimgNCKlMlmto7Pi5",
+  port: 12345,
+  host: "",
+  username: "",
+  password: "",
 });
 
 class SocketService {
@@ -29,7 +29,7 @@ class SocketService {
       },
     });
 
-    // subscribing to the redis for channel "MESSAGES"
+    //  subscribing to the redis for channel "MESSAGES"
     sub.subscribe("MESSAGES");
   }
 
@@ -43,7 +43,7 @@ class SocketService {
       socket.on("client:message", async ({ message }: { message: string }) => {
         console.log("On Client:Message, Rec Payload is : ", message);
 
-        // pushing the recieved message to redis cloud
+        //  pushing the recieved message to redis cloud
         await pub.publish("MESSAGES", JSON.stringify({ message }));
       });
     });
@@ -55,7 +55,7 @@ class SocketService {
         console.log("\nMsg from MESSAGES Channel is : ", payload.message);
         io.emit("srv:message", message);
 
-        // publishing the message to kafka broker
+        //  publishing the message to kafka broker
         await produceMessage(message);
       }
     });
